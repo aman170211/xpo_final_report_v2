@@ -156,7 +156,7 @@ function renderRecords(data) {
 
     const createdDate = record.Created_Date || "Unknown Date";
     const fileName = record.File_Name || `Invoice #${idx + 1}`;
-    const isReviewed = record.Reviewed === true;
+    const isReviewed = record.Reviewed === true || record.Reviewed === "true";
 
     header.innerHTML = `
       📄 ${createdDate} — ${fileName}
