@@ -130,13 +130,6 @@ function buildTable(record) {
   return `<table>${rows}</table>`;
 }
 
-function toggle(index) {
-  const contents = document.querySelectorAll('.content');
-  contents.forEach((el, i) => {
-    el.style.display = i === index && el.style.display !== 'block' ? 'block' : 'none';
-  });
-}
-
 function renderRecords(data) {
   const unreviewedContainer = document.getElementById('unreviewedContainer');
   const reviewedContainer = document.getElementById('reviewedContainer');
@@ -154,7 +147,7 @@ function renderRecords(data) {
     return;
   }
 
-  data.forEach((record, index) => {
+  data.forEach((record, idx) => {
     const wrapper = document.createElement('div');
     wrapper.className = 'record';
 
@@ -162,14 +155,13 @@ function renderRecords(data) {
     header.className = 'header';
 
     const createdDate = record.Created_Date || "Unknown Date";
-    const fileName = record.File_Name || `Invoice #${index + 1}`;
+    const fileName = record.File_Name || `Invoice #${idx + 1}`;
+    const isReviewed = record.Reviewed === true;
+
     header.innerHTML = `
-      ${index + 1}. 📄 ${createdDate} — ${fileName}
-      <input type="checkbox" class="reviewCheckbox" title="Mark as Reviewed" />
+      📄 ${createdDate} — ${fileName}
+      <input type="checkbox" class="reviewCheckbox" title="Mark as Reviewed" ${isReviewed ? "checked" : ""}/>
     `;
-    header.onclick = (e) => {
-      if (e.target.tagName !== 'INPUT') toggle(index);
-    };
 
     const content = document.createElement('div');
     content.className = 'content';
@@ -177,6 +169,11 @@ function renderRecords(data) {
 
     wrapper.appendChild(header);
     wrapper.appendChild(content);
+
+    header.addEventListener('click', (e) => {
+      if (e.target.classList.contains('reviewCheckbox')) return; 
+      content.style.display = (content.style.display === 'block') ? 'none' : 'block';
+    });
 
     const checkbox = header.querySelector('.reviewCheckbox');
     checkbox.addEventListener('change', () => {
@@ -187,7 +184,11 @@ function renderRecords(data) {
       }
     });
 
-    unreviewedContainer.appendChild(wrapper);
+    if (isReviewed) {
+      reviewedContainer.appendChild(wrapper);
+    } else {
+      unreviewedContainer.appendChild(wrapper);
+    }
   });
 
   setupCopyEvents();
@@ -217,8 +218,7 @@ function formatDateToZoho(date) {
 }
 
 function getMonthShortName(month) {
-  const names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   return names[month - 1];
 }
 
@@ -259,7 +259,7 @@ document.getElementById("createdDate").addEventListener("change", (e) => {
   fetchDataForDate(e.target.value);
 });
 
-// Tab toggling logic
+// Tabs switching
 document.getElementById("tab-unreviewed").addEventListener("click", () => {
   document.getElementById("unreviewedSection").classList.add("active");
   document.getElementById("reviewedSection").classList.remove("active");
