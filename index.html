@@ -148,48 +148,52 @@ function renderRecords(data) {
   }
 
   data.forEach((record, idx) => {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'record';
+  const wrapper = document.createElement('div');
+  wrapper.className = 'record';
 
-    const header = document.createElement('div');
-    header.className = 'header';
+  const header = document.createElement('div');
+  header.className = 'header';
 
-    const createdDate = record.Created_Date || "Unknown Date";
-    const fileName = record.File_Name || `Invoice #${idx + 1}`;
-    const isReviewed = record.Reviewed === true || record.Reviewed === "true";
+  const createdDate = record.Created_Date || "Unknown Date";
+  const fileName = record.File_Name || `Invoice #${idx + 1}`;
+  const recordNumber = idx + 1;
 
-    header.innerHTML = `
-      📄 ${createdDate} — ${fileName}
-      <input type="checkbox" class="reviewCheckbox" title="Mark as Reviewed" ${isReviewed ? "checked" : ""}/>
-    `;
+  // FIX: Handle both boolean and string true
+  const isReviewed = record.Reviewed === true || record.Reviewed === "true";
 
-    const content = document.createElement('div');
-    content.className = 'content';
-    content.innerHTML = buildTable(record);
+  header.innerHTML = `
+    ${recordNumber}. 📄 ${createdDate} — ${fileName}
+    <input type="checkbox" class="reviewCheckbox" title="Mark as Reviewed" ${isReviewed ? "checked" : ""}/>
+  `;
 
-    wrapper.appendChild(header);
-    wrapper.appendChild(content);
+  const content = document.createElement('div');
+  content.className = 'content';
+  content.innerHTML = buildTable(record);
 
-    header.addEventListener('click', (e) => {
-      if (e.target.classList.contains('reviewCheckbox')) return; 
-      content.style.display = (content.style.display === 'block') ? 'none' : 'block';
-    });
+  wrapper.appendChild(header);
+  wrapper.appendChild(content);
 
-    const checkbox = header.querySelector('.reviewCheckbox');
-    checkbox.addEventListener('change', () => {
-      if (checkbox.checked) {
-        reviewedContainer.appendChild(wrapper);
-      } else {
-        unreviewedContainer.appendChild(wrapper);
-      }
-    });
+  header.addEventListener('click', (e) => {
+    if (e.target.classList.contains('reviewCheckbox')) return;
+    content.style.display = (content.style.display === 'block') ? 'none' : 'block';
+  });
 
-    if (isReviewed) {
-      reviewedContainer.appendChild(wrapper);
+  const checkbox = header.querySelector('.reviewCheckbox');
+  checkbox.addEventListener('change', () => {
+    if (checkbox.checked) {
+      document.getElementById('reviewedContainer').appendChild(wrapper);
     } else {
-      unreviewedContainer.appendChild(wrapper);
+      document.getElementById('unreviewedContainer').appendChild(wrapper);
     }
   });
+
+  if (isReviewed) {
+    document.getElementById('reviewedContainer').appendChild(wrapper);
+  } else {
+    document.getElementById('unreviewedContainer').appendChild(wrapper);
+  }
+});
+
 
   setupCopyEvents();
 }
