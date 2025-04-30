@@ -181,7 +181,7 @@ function renderRecords(data) {
       const reviewedVal = checkbox.checked ? "true" : "false";
       const url = `https://svnng1c8c3.execute-api.us-east-2.amazonaws.com/default/Mark_Reviewd_XPO?record_id=${recordId}&reviewed=${reviewedVal}`;
 
-      fetch(url, { method: 'GET' })
+      fetch(url, { method: 'POST' })
         .then(res => res.json())
         .then(data => console.log(`✅ Review status updated for ${recordId}:`, data))
         .catch(err => console.warn(`⚠️ Failed to update review status for ${recordId}`, err));
