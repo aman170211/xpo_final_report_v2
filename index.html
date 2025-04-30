@@ -6,20 +6,18 @@
   <style>
     body { font-family: Arial, sans-serif; background: #f5f7fa; padding: 30px; }
     h2 { margin-bottom: 20px; }
-    .tab-buttons {
-      display: flex; gap: 10px; margin-bottom: 20px;
-    }
+    .tab-buttons { display: flex; gap: 10px; margin-bottom: 20px; }
     .tab-buttons button {
       padding: 10px 20px; border: none; background: #d6dff6; color: #1c3f93;
       font-weight: bold; border-radius: 6px; cursor: pointer;
     }
-    .tab-buttons button.active {
-      background: #1c3f93; color: white;
-    }
+    .tab-buttons button.active { background: #1c3f93; color: white; }
     .tab-section { display: none; }
     .tab-section.active { display: block; }
-
-    .filter-section { margin-bottom: 20px; display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+    .filter-section {
+      margin-bottom: 20px; display: flex; align-items: center;
+      gap: 12px; flex-wrap: wrap;
+    }
     .filter-section label { font-weight: bold; font-size: 16px; }
     .filter-section input[type="date"] {
       padding: 8px 12px; border: 1px solid #ccc; border-radius: 6px;
@@ -30,16 +28,17 @@
       border-color: #1c3f93;
       box-shadow: 0 0 5px rgba(28, 63, 147, 0.3);
     }
-
     #recordCount { font-weight: bold; font-size: 15px; color: #333; }
     .summary-tile {
       background-color: #ffffff; border: 1px solid #d9d9d9; border-left: 6px solid #1c3f93;
       padding: 16px 20px; font-size: 16px; font-weight: bold; color: #1c3f93;
       border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.06);
     }
-
     .record { border: 1px solid #ccc; margin-bottom: 15px; border-radius: 8px; background: white; overflow: hidden; }
-    .header { background: #1c3f93; color: white; padding: 12px 16px; font-weight: bold; cursor: pointer; position: relative; }
+    .header {
+      background: #1c3f93; color: white; padding: 12px 16px; font-weight: bold;
+      cursor: pointer; position: relative;
+    }
     .header input[type="checkbox"] {
       position: absolute; right: 16px; top: 12px;
       transform: scale(1.4); cursor: pointer;
@@ -64,7 +63,7 @@
 <div class="filter-section">
   <label for="createdDate">Created Date:</label>
   <input type="date" id="createdDate" />
-  <span id="recordCount">🧾 Records found: ...</span>
+  <span id="recordCount">📟 Records found: ...</span>
 </div>
 
 <div id="summaryTile" class="summary-tile" style="display:none;">
@@ -135,7 +134,7 @@ function renderRecords(data) {
   const reviewedContainer = document.getElementById('reviewedContainer');
   const count = data.length;
 
-  document.getElementById('recordCount').textContent = `🧾 Records found: ${count}`;
+  document.getElementById('recordCount').textContent = `📟 Records found: ${count}`;
   document.getElementById('tileCount').textContent = count;
   document.getElementById('summaryTile').style.display = "block";
 
@@ -148,52 +147,58 @@ function renderRecords(data) {
   }
 
   data.forEach((record, idx) => {
-  const wrapper = document.createElement('div');
-  wrapper.className = 'record';
+    const wrapper = document.createElement('div');
+    wrapper.className = 'record';
 
-  const header = document.createElement('div');
-  header.className = 'header';
+    const header = document.createElement('div');
+    header.className = 'header';
 
-  const createdDate = record.Created_Date || "Unknown Date";
-  const fileName = record.File_Name || `Invoice #${idx + 1}`;
-  const recordNumber = idx + 1;
+    const createdDate = record.Created_Date || "Unknown Date";
+    const fileName = record.File_Name || `Invoice #${idx + 1}`;
+    const recordNumber = idx + 1;
+    const recordId = record.ID || record.Id || record.id;
+    const isReviewed = record.Reviewed === true || record.Reviewed === "true";
 
-  // FIX: Handle both boolean and string true
-  const isReviewed = record.Reviewed === true || record.Reviewed === "true";
+    header.innerHTML = `
+      ${recordNumber}. 📄 ${createdDate} — ${fileName}
+      <input type="checkbox" class="reviewCheckbox" title="Mark as Reviewed" ${isReviewed ? "checked" : ""}/>
+    `;
 
-  header.innerHTML = `
-    ${recordNumber}. 📄 ${createdDate} — ${fileName}
-    <input type="checkbox" class="reviewCheckbox" title="Mark as Reviewed" ${isReviewed ? "checked" : ""}/>
-  `;
+    const content = document.createElement('div');
+    content.className = 'content';
+    content.innerHTML = buildTable(record);
 
-  const content = document.createElement('div');
-  content.className = 'content';
-  content.innerHTML = buildTable(record);
+    wrapper.appendChild(header);
+    wrapper.appendChild(content);
 
-  wrapper.appendChild(header);
-  wrapper.appendChild(content);
+    header.addEventListener('click', (e) => {
+      if (e.target.classList.contains('reviewCheckbox')) return;
+      content.style.display = (content.style.display === 'block') ? 'none' : 'block';
+    });
 
-  header.addEventListener('click', (e) => {
-    if (e.target.classList.contains('reviewCheckbox')) return;
-    content.style.display = (content.style.display === 'block') ? 'none' : 'block';
-  });
+    const checkbox = header.querySelector('.reviewCheckbox');
+    checkbox.addEventListener('change', () => {
+      const reviewedVal = checkbox.checked ? "true" : "false";
+      const url = `https://svnng1c8c3.execute-api.us-east-2.amazonaws.com/default/Mark_Reviewd_XPO?record_id=${recordId}&reviewed=${reviewedVal}`;
 
-  const checkbox = header.querySelector('.reviewCheckbox');
-  checkbox.addEventListener('change', () => {
-    if (checkbox.checked) {
-      document.getElementById('reviewedContainer').appendChild(wrapper);
+      fetch(url, { method: 'GET' })
+        .then(res => res.json())
+        .then(data => console.log(`✅ Review status updated for ${recordId}:`, data))
+        .catch(err => console.warn(`⚠️ Failed to update review status for ${recordId}`, err));
+
+      if (checkbox.checked) {
+        reviewedContainer.appendChild(wrapper);
+      } else {
+        unreviewedContainer.appendChild(wrapper);
+      }
+    });
+
+    if (isReviewed) {
+      reviewedContainer.appendChild(wrapper);
     } else {
-      document.getElementById('unreviewedContainer').appendChild(wrapper);
+      unreviewedContainer.appendChild(wrapper);
     }
   });
-
-  if (isReviewed) {
-    document.getElementById('reviewedContainer').appendChild(wrapper);
-  } else {
-    document.getElementById('unreviewedContainer').appendChild(wrapper);
-  }
-});
-
 
   setupCopyEvents();
 }
@@ -229,7 +234,6 @@ function getMonthShortName(month) {
 async function fetchDataForDate(dateStr) {
   const formattedDate = formatDateToZoho(dateStr);
   window.lastDateFormatted = formattedDate;
-
   const apiUrl = `https://ew0nbf06x1.execute-api.us-east-2.amazonaws.com/XPO_final_Data_fetch?Created_Date=${encodeURIComponent(formattedDate)}`;
 
   try {
@@ -237,14 +241,11 @@ async function fetchDataForDate(dateStr) {
       method: "POST",
       headers: { "Content-Type": "application/json" }
     });
-
     const apiData = await apiResponse.json();
-    console.log(`✅ API Response for ${formattedDate}:`, apiData);
-    const records = apiData.data || [];
-    renderRecords(records);
+    renderRecords(apiData.data || []);
   } catch (error) {
     console.warn("⚠️ Error fetching data:", error);
-    document.getElementById("recordCount").textContent = `🧾 Records found: 0`;
+    document.getElementById("recordCount").textContent = `📟 Records found: 0`;
     document.getElementById("tileCount").textContent = "0";
     document.getElementById("summaryTile").style.display = "block";
     renderRecords([]);
@@ -263,7 +264,6 @@ document.getElementById("createdDate").addEventListener("change", (e) => {
   fetchDataForDate(e.target.value);
 });
 
-// Tabs switching
 document.getElementById("tab-unreviewed").addEventListener("click", () => {
   document.getElementById("unreviewedSection").classList.add("active");
   document.getElementById("reviewedSection").classList.remove("active");
