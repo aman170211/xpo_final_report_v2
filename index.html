@@ -88,35 +88,212 @@
 </div>
 
 <script>
-// Add inside renderRecords()
-const manualReviewContainer = document.getElementById('manualReviewContainer');
-...
-manualReviewContainer.innerHTML = '';
-...
-const isManualReview = record.Manual_Review_Needed === true || record.Manual_Review_Needed === "true";
-...
-checkbox.addEventListener('change', () => {
-  const reviewedVal = checkbox.checked ? "true" : "false";
-  const url = `https://svnng1c8c3.execute-api.us-east-2.amazonaws.com/default/Mark_Reviewd_XPO?record_id=${recordId}&reviewed=${reviewedVal}`;
-  fetch(url, { method: 'POST' })...
-  if (checkbox.checked) {
-    reviewedContainer.appendChild(wrapper);
-  } else if (isManualReview) {
-    manualReviewContainer.appendChild(wrapper);
-  } else {
-    unreviewedContainer.appendChild(wrapper);
+const fieldMapping = {
+  "File_Name": "File Name",
+  "Created_Date": "Created Date",
+  "Consignee_Name": "Consignee",
+  "Consignee_City": "Consignee City",
+  "Consignee_State": "Consignee State",
+  "Consignee_Zip": "Consignee Zip",
+  "Shipper_Name": "Shipper",
+  "Shipper_City": "Shipper City",
+  "Shipper_State": "Shipper State",
+  "Shipper_Zip": "Shipper Zip",
+  "Pro_Number": "Pro Number",
+  "Delivered_Date_Delivery": "Delivered Date",
+  "Freight_Charge_Invoice": "Freight Charge",
+  "Fuel_Surcharge_Invoice": "Fuel Surcharge",
+  "Discount_Percentage": "Discount %",
+  "Discount_Amount_Invoice": "Discount Amount",
+  "SubTotal": "Subtotal",
+  "Accessorials_Invoice": "Accessorials",
+  "Weight": "Weight",
+  "Url": "PDF Link"
+};
+
+function buildTable(record) {
+  let rows = '';
+  for (let key in fieldMapping) {
+    let label = fieldMapping[key];
+    let val = record[key] || '';
+    if (typeof val === 'object' && val.url) {
+      val = `<a href="${val.url}" target="_blank">Open PDF</a>`;
+    }
+    const rawText = typeof record[key] === 'object' ? record[key].url : record[key] || '';
+    rows += `
+      <tr>
+        <th>${label}</th>
+        <td class="copyable" data-copy="${rawText}">
+          ${val}
+          <span class="tooltip">Copied!</span>
+        </td>
+      </tr>
+    `;
   }
-});
-...
-if (isReviewed) {
-  reviewedContainer.appendChild(wrapper);
-} else if (isManualReview) {
-  wrapper.classList.add("manual-review");
-  manualReviewContainer.appendChild(wrapper);
-} else {
-  unreviewedContainer.appendChild(wrapper);
+  return `<table>${rows}</table>`;
 }
-...
+
+function renderRecords(data) {
+  const unreviewedContainer = document.getElementById('unreviewedContainer');
+  const reviewedContainer = document.getElementById('reviewedContainer');
+  const manualReviewContainer = document.getElementById('manualReviewContainer');
+  const count = data.length;
+
+  document.getElementById('recordCount').textContent = `📟 Records found: ${count}`;
+  document.getElementById('tileCount').textContent = count;
+  document.getElementById('summaryTile').style.display = "block";
+
+  unreviewedContainer.innerHTML = '';
+  reviewedContainer.innerHTML = '';
+  manualReviewContainer.innerHTML = '';
+
+  if (count === 0) {
+    unreviewedContainer.innerHTML = `<p>No Entries for <strong>${window.lastDateFormatted}</strong> yet!! 😀</p>`;
+    return;
+  }
+
+  data.forEach((record, idx) => {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'record';
+
+    const header = document.createElement('div');
+    header.className = 'header';
+
+    const createdDate = record.Created_Date || "Unknown Date";
+    const fileName = record.File_Name || `Invoice #${idx + 1}`;
+    const recordNumber = idx + 1;
+    const recordId = record.ID || record.Id || record.id;
+    const isReviewed = record.Reviewed === true || record.Reviewed === "true";
+    const isManualReview = record.Manual_Review_Needed === true || record.Manual_Review_Needed === "true";
+
+    header.innerHTML = `
+      ${recordNumber}. 📄 ${createdDate} — ${fileName}
+      <input type="checkbox" class="reviewCheckbox" title="Mark as Reviewed" ${isReviewed ? "checked" : ""}/>
+    `;
+
+    const content = document.createElement('div');
+    content.className = 'content';
+    content.innerHTML = buildTable(record);
+
+    wrapper.appendChild(header);
+    wrapper.appendChild(content);
+
+    header.addEventListener('click', (e) => {
+      if (e.target.classList.contains('reviewCheckbox')) return;
+      content.style.display = (content.style.display === 'block') ? 'none' : 'block';
+    });
+
+    const checkbox = header.querySelector('.reviewCheckbox');
+    checkbox.addEventListener('change', () => {
+      const reviewedVal = checkbox.checked ? "true" : "false";
+      const url = `https://svnng1c8c3.execute-api.us-east-2.amazonaws.com/default/Mark_Reviewd_XPO?record_id=${recordId}&reviewed=${reviewedVal}`;
+
+      fetch(url, { method: 'POST' })
+        .then(res => res.json())
+        .then(data => console.log(`✅ Review status updated for ${recordId}:`, data))
+        .catch(err => console.warn(`⚠️ Failed to update review status for ${recordId}`, err));
+
+      if (checkbox.checked) {
+        reviewedContainer.appendChild(wrapper);
+      } else if (isManualReview) {
+        manualReviewContainer.appendChild(wrapper);
+      } else {
+        unreviewedContainer.appendChild(wrapper);
+      }
+    });
+
+    if (isReviewed) {
+      reviewedContainer.appendChild(wrapper);
+    } else if (isManualReview) {
+      wrapper.classList.add("manual-review");
+      manualReviewContainer.appendChild(wrapper);
+    } else {
+      unreviewedContainer.appendChild(wrapper);
+    }
+  });
+
+  setupCopyEvents();
+}
+
+function setupCopyEvents() {
+  const copyableCells = document.querySelectorAll('.copyable');
+  copyableCells.forEach(cell => {
+    cell.addEventListener('click', () => {
+      const textToCopy = cell.getAttribute('data-copy');
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        cell.classList.add('copied');
+        const tooltip = cell.querySelector('.tooltip');
+        tooltip.style.display = 'inline';
+        setTimeout(() => { tooltip.style.display = 'none'; }, 1000);
+      });
+    });
+  });
+}
+
+function formatDateToZoho(date) {
+  const parts = date.split("-");
+  const day = parts[2].padStart(2, '0');
+  const month = getMonthShortName(parseInt(parts[1]));
+  const year = parts[0];
+  return `${day}-${month}-${year}`;
+}
+
+function getMonthShortName(month) {
+  const names = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return names[month - 1];
+}
+
+async function fetchDataForDate(dateStr) {
+  const formattedDate = formatDateToZoho(dateStr);
+  window.lastDateFormatted = formattedDate;
+  const apiUrl = `https://ew0nbf06x1.execute-api.us-east-2.amazonaws.com/XPO_final_Data_fetch?Created_Date=${encodeURIComponent(formattedDate)}`;
+
+  try {
+    const apiResponse = await fetch(apiUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" }
+    });
+    const apiData = await apiResponse.json();
+    renderRecords(apiData.data || []);
+  } catch (error) {
+    console.warn("⚠️ Error fetching data:", error);
+    document.getElementById("recordCount").textContent = `📟 Records found: 0`;
+    document.getElementById("tileCount").textContent = "0";
+    document.getElementById("summaryTile").style.display = "block";
+    renderRecords([]);
+  }
+}
+
+function setDefaultDate() {
+  const input = document.getElementById("createdDate");
+  const today = new Date().toISOString().split("T")[0];
+  input.value = today;
+  fetchDataForDate(today);
+}
+
+setDefaultDate();
+document.getElementById("createdDate").addEventListener("change", (e) => {
+  fetchDataForDate(e.target.value);
+});
+
+document.getElementById("tab-unreviewed").addEventListener("click", () => {
+  document.getElementById("unreviewedSection").classList.add("active");
+  document.getElementById("reviewedSection").classList.remove("active");
+  document.getElementById("manualReviewSection").classList.remove("active");
+  document.getElementById("tab-unreviewed").classList.add("active");
+  document.getElementById("tab-reviewed").classList.remove("active");
+  document.getElementById("tab-manual-review").classList.remove("active");
+});
+
+document.getElementById("tab-reviewed").addEventListener("click", () => {
+  document.getElementById("reviewedSection").classList.add("active");
+  document.getElementById("unreviewedSection").classList.remove("active");
+  document.getElementById("manualReviewSection").classList.remove("active");
+  document.getElementById("tab-reviewed").classList.add("active");
+  document.getElementById("tab-unreviewed").classList.remove("active");
+  document.getElementById("tab-manual-review").classList.remove("active");
+});
+
 document.getElementById("tab-manual-review").addEventListener("click", () => {
   document.getElementById("manualReviewSection").classList.add("active");
   document.getElementById("unreviewedSection").classList.remove("active");
