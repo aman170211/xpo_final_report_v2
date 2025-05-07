@@ -75,6 +75,7 @@
   <button id="tab-unreviewed" class="active">📂 Unreviewed</button>
   <button id="tab-reviewed">✅ Reviewed</button>
   <button id="tab-manual-review" style="background:#fff8e1; color:#c29100; font-weight:bold;">⚠️ Manual Review</button>
+  <button id="tab-balance-due" style="background:#fff3f3; color:#b30000; font-weight:bold;">💰 Balance Due</button>
 </div>
 
 <div id="unreviewedSection" class="tab-section active">
@@ -85,6 +86,9 @@
 </div>
 <div id="manualReviewSection" class="tab-section">
   <div id="manualReviewContainer"></div>
+</div>
+<div id="balanceDueSection" class="tab-section">
+  <div id="balanceDueContainer"></div>
 </div>
 
 <script>
@@ -208,15 +212,17 @@ function renderRecords(data) {
       }
     });
 
-    if (isReviewed) {
-      reviewedContainer.appendChild(wrapper);
-    } else if (isManualReview) {
-      wrapper.classList.add("manual-review");
-      manualReviewContainer.appendChild(wrapper);
-    } else {
-      unreviewedContainer.appendChild(wrapper);
-    }
-  });
+   if (record.Balance_Due_checkbox === true || record.Balance_Due_checkbox === "true") {
+  balanceDueContainer.appendChild(wrapper);
+} else if (isReviewed) {
+  reviewedContainer.appendChild(wrapper);
+} else if (isManualReview) {
+  wrapper.classList.add("manual-review");
+  manualReviewContainer.appendChild(wrapper);
+} else {
+  unreviewedContainer.appendChild(wrapper);
+}
+
 
   setupCopyEvents();
 }
@@ -283,31 +289,32 @@ document.getElementById("createdDate").addEventListener("change", (e) => {
 });
 
 document.getElementById("tab-unreviewed").addEventListener("click", () => {
-  document.getElementById("unreviewedSection").classList.add("active");
-  document.getElementById("reviewedSection").classList.remove("active");
-  document.getElementById("manualReviewSection").classList.remove("active");
-  document.getElementById("tab-unreviewed").classList.add("active");
-  document.getElementById("tab-reviewed").classList.remove("active");
-  document.getElementById("tab-manual-review").classList.remove("active");
+  setActiveTab("unreviewed");
 });
 
 document.getElementById("tab-reviewed").addEventListener("click", () => {
-  document.getElementById("reviewedSection").classList.add("active");
-  document.getElementById("unreviewedSection").classList.remove("active");
-  document.getElementById("manualReviewSection").classList.remove("active");
-  document.getElementById("tab-reviewed").classList.add("active");
-  document.getElementById("tab-unreviewed").classList.remove("active");
-  document.getElementById("tab-manual-review").classList.remove("active");
+  setActiveTab("reviewed");
 });
 
 document.getElementById("tab-manual-review").addEventListener("click", () => {
-  document.getElementById("manualReviewSection").classList.add("active");
-  document.getElementById("unreviewedSection").classList.remove("active");
-  document.getElementById("reviewedSection").classList.remove("active");
-  document.getElementById("tab-manual-review").classList.add("active");
-  document.getElementById("tab-unreviewed").classList.remove("active");
-  document.getElementById("tab-reviewed").classList.remove("active");
+  setActiveTab("manual-review");
 });
+
+document.getElementById("tab-balance-due").addEventListener("click", () => {
+  setActiveTab("balance-due");
+});
+
+function setActiveTab(tabName) {
+  const allSections = ["unreviewed", "reviewed", "manual-review", "balance-due"];
+  allSections.forEach(name => {
+    document.getElementById(`${name}Section`).classList.remove("active");
+    document.getElementById(`tab-${name}`).classList.remove("active");
+  });
+
+  document.getElementById(`${tabName}Section`).classList.add("active");
+  document.getElementById(`tab-${tabName}`).classList.add("active");
+}
+
 </script>
 </body>
 </html>
