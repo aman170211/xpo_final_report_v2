@@ -75,7 +75,6 @@
   <button id="tab-unreviewed" class="active">📂 Unreviewed</button>
   <button id="tab-reviewed">✅ Reviewed</button>
   <button id="tab-manual-review" style="background:#fff8e1; color:#c29100; font-weight:bold;">⚠️ Manual Review</button>
-  <button id="tab-balance-due" style="background:#fff3f3; color:#b30000; font-weight:bold;">💰 Balance Due</button>
 </div>
 
 <div id="unreviewedSection" class="tab-section active">
@@ -86,9 +85,6 @@
 </div>
 <div id="manualReviewSection" class="tab-section">
   <div id="manualReviewContainer"></div>
-</div>
-<div id="balanceDueSection" class="tab-section">
-  <div id="balanceDueContainer"></div>
 </div>
 
 <script>
@@ -127,10 +123,10 @@ function buildTable(record) {
     let label = fieldMapping[key];
     let val = record[key] || '';
     if (typeof val === 'object' && val.url) {
-      val = `<a href="${val.url}" target="_blank">Open PDF</a>`;
+      val = <a href="${val.url}" target="_blank">Open PDF</a>;
     }
     const rawText = typeof record[key] === 'object' ? record[key].url : record[key] || '';
-    rows += `
+    rows += 
       <tr>
         <th>${label}</th>
         <td class="copyable" data-copy="${rawText}">
@@ -138,9 +134,9 @@ function buildTable(record) {
           <span class="tooltip">Copied!</span>
         </td>
       </tr>
-    `;
+    ;
   }
-  return `<table>${rows}</table>`;
+  return <table>${rows}</table>;
 }
 
 function renderRecords(data) {
@@ -149,7 +145,7 @@ function renderRecords(data) {
   const manualReviewContainer = document.getElementById('manualReviewContainer');
   const count = data.length;
 
-  document.getElementById('recordCount').textContent = `📟 Records found: ${count}`;
+  document.getElementById('recordCount').textContent = 📟 Records found: ${count};
   document.getElementById('tileCount').textContent = count;
   document.getElementById('summaryTile').style.display = "block";
 
@@ -158,7 +154,7 @@ function renderRecords(data) {
   manualReviewContainer.innerHTML = '';
 
   if (count === 0) {
-    unreviewedContainer.innerHTML = `<p>No Entries for <strong>${window.lastDateFormatted}</strong> yet!! 😀</p>`;
+    unreviewedContainer.innerHTML = <p>No Entries for <strong>${window.lastDateFormatted}</strong> yet!! 😀</p>;
     return;
   }
 
@@ -170,16 +166,16 @@ function renderRecords(data) {
     header.className = 'header';
 
     const createdDate = record.Created_Date || "Unknown Date";
-    const fileName = record.File_Name || `Invoice #${idx + 1}`;
+    const fileName = record.File_Name || Invoice #${idx + 1};
     const recordNumber = idx + 1;
     const recordId = record.ID || record.Id || record.id;
     const isReviewed = record.Reviewed === true || record.Reviewed === "true";
     const isManualReview = record.Manual_Review_Needed === true || record.Manual_Review_Needed === "true";
 
-    header.innerHTML = `
+    header.innerHTML = 
       ${recordNumber}. 📄 ${createdDate} — ${fileName}
       <input type="checkbox" class="reviewCheckbox" title="Mark as Reviewed" ${isReviewed ? "checked" : ""}/>
-    `;
+    ;
 
     const content = document.createElement('div');
     content.className = 'content';
@@ -196,12 +192,12 @@ function renderRecords(data) {
     const checkbox = header.querySelector('.reviewCheckbox');
     checkbox.addEventListener('change', () => {
       const reviewedVal = checkbox.checked ? "true" : "false";
-      const url = `https://svnng1c8c3.execute-api.us-east-2.amazonaws.com/default/Mark_Reviewd_XPO?record_id=${recordId}&reviewed=${reviewedVal}`;
+      const url = https://svnng1c8c3.execute-api.us-east-2.amazonaws.com/default/Mark_Reviewd_XPO?record_id=${recordId}&reviewed=${reviewedVal};
 
       fetch(url, { method: 'POST' })
         .then(res => res.json())
-        .then(data => console.log(`✅ Review status updated for ${recordId}:`, data))
-        .catch(err => console.warn(`⚠️ Failed to update review status for ${recordId}`, err));
+        .then(data => console.log(✅ Review status updated for ${recordId}:, data))
+        .catch(err => console.warn(⚠️ Failed to update review status for ${recordId}, err));
 
       if (checkbox.checked) {
         reviewedContainer.appendChild(wrapper);
@@ -212,19 +208,19 @@ function renderRecords(data) {
       }
     });
 
-   if (record.Balance_Due_checkbox === true || record.Balance_Due_checkbox === "true") {
-  balanceDueContainer.appendChild(wrapper);
-} else if (isReviewed) {
-  reviewedContainer.appendChild(wrapper);
-} else if (isManualReview) {
-  wrapper.classList.add("manual-review");
-  manualReviewContainer.appendChild(wrapper);
-} else {
-  unreviewedContainer.appendChild(wrapper);
+    if (isReviewed) {
+      reviewedContainer.appendChild(wrapper);
+    } else if (isManualReview) {
+      wrapper.classList.add("manual-review");
+      manualReviewContainer.appendChild(wrapper);
+    } else {
+      unreviewedContainer.appendChild(wrapper);
+    }
+  });
+
+  setupCopyEvents();
 }
-});
-setupCopyEvents();
-}
+
 function setupCopyEvents() {
   const copyableCells = document.querySelectorAll('.copyable');
   copyableCells.forEach(cell => {
@@ -245,7 +241,7 @@ function formatDateToZoho(date) {
   const day = parts[2].padStart(2, '0');
   const month = getMonthShortName(parseInt(parts[1]));
   const year = parts[0];
-  return `${day}-${month}-${year}`;
+  return ${day}-${month}-${year};
 }
 
 function getMonthShortName(month) {
@@ -256,7 +252,7 @@ function getMonthShortName(month) {
 async function fetchDataForDate(dateStr) {
   const formattedDate = formatDateToZoho(dateStr);
   window.lastDateFormatted = formattedDate;
-  const apiUrl = `https://ew0nbf06x1.execute-api.us-east-2.amazonaws.com/XPO_final_Data_fetch?Created_Date=${encodeURIComponent(formattedDate)}`;
+  const apiUrl = https://ew0nbf06x1.execute-api.us-east-2.amazonaws.com/XPO_final_Data_fetch?Created_Date=${encodeURIComponent(formattedDate)};
 
   try {
     const apiResponse = await fetch(apiUrl, {
@@ -267,7 +263,7 @@ async function fetchDataForDate(dateStr) {
     renderRecords(apiData.data || []);
   } catch (error) {
     console.warn("⚠️ Error fetching data:", error);
-    document.getElementById("recordCount").textContent = `📟 Records found: 0`;
+    document.getElementById("recordCount").textContent = 📟 Records found: 0;
     document.getElementById("tileCount").textContent = "0";
     document.getElementById("summaryTile").style.display = "block";
     renderRecords([]);
@@ -287,32 +283,31 @@ document.getElementById("createdDate").addEventListener("change", (e) => {
 });
 
 document.getElementById("tab-unreviewed").addEventListener("click", () => {
-  setActiveTab("unreviewed");
+  document.getElementById("unreviewedSection").classList.add("active");
+  document.getElementById("reviewedSection").classList.remove("active");
+  document.getElementById("manualReviewSection").classList.remove("active");
+  document.getElementById("tab-unreviewed").classList.add("active");
+  document.getElementById("tab-reviewed").classList.remove("active");
+  document.getElementById("tab-manual-review").classList.remove("active");
 });
 
 document.getElementById("tab-reviewed").addEventListener("click", () => {
-  setActiveTab("reviewed");
+  document.getElementById("reviewedSection").classList.add("active");
+  document.getElementById("unreviewedSection").classList.remove("active");
+  document.getElementById("manualReviewSection").classList.remove("active");
+  document.getElementById("tab-reviewed").classList.add("active");
+  document.getElementById("tab-unreviewed").classList.remove("active");
+  document.getElementById("tab-manual-review").classList.remove("active");
 });
 
 document.getElementById("tab-manual-review").addEventListener("click", () => {
-  setActiveTab("manual-review");
+  document.getElementById("manualReviewSection").classList.add("active");
+  document.getElementById("unreviewedSection").classList.remove("active");
+  document.getElementById("reviewedSection").classList.remove("active");
+  document.getElementById("tab-manual-review").classList.add("active");
+  document.getElementById("tab-unreviewed").classList.remove("active");
+  document.getElementById("tab-reviewed").classList.remove("active");
 });
-
-document.getElementById("tab-balance-due").addEventListener("click", () => {
-  setActiveTab("balance-due");
-});
-
-function setActiveTab(tabName) {
-  const allSections = ["unreviewed", "reviewed", "manual-review", "balance-due"];
-  allSections.forEach(name => {
-    document.getElementById(`${name}Section`).classList.remove("active");
-    document.getElementById(`tab-${name}`).classList.remove("active");
-  });
-
-  document.getElementById(`${tabName}Section`).classList.add("active");
-  document.getElementById(`tab-${tabName}`).classList.add("active");
-};
-
 </script>
 </body>
 </html>
