@@ -222,11 +222,9 @@ function renderRecords(data) {
 } else {
   unreviewedContainer.appendChild(wrapper);
 }
-
-
- 
-}
+});
 setupCopyEvents();
+}
 function setupCopyEvents() {
   const copyableCells = document.querySelectorAll('.copyable');
   copyableCells.forEach(cell => {
