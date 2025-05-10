@@ -214,16 +214,18 @@ window.onload = function () {
         }
       });
 
-      if (String(record.Balance_Due_checkbox).toLowerCase() === "true") {
-        balanceDueContainer.appendChild(wrapper);
-      } else if (isReviewed) {
-        reviewedContainer.appendChild(wrapper);
-      } else if (isManualReview) {
-        wrapper.classList.add("manual-review");
-        manualReviewContainer.appendChild(wrapper);
-      } else {
-        unreviewedContainer.appendChild(wrapper);
-      }
+     const isBalanceDue = String(record.Balance_Due_checkbox).toLowerCase() === "true";
+
+if (isBalanceDue) {
+  balanceDueContainer.appendChild(wrapper);
+} else if (isReviewed) {
+  reviewedContainer.appendChild(wrapper);
+} else if (isManualReview) {
+  wrapper.classList.add("manual-review");
+  manualReviewContainer.appendChild(wrapper);
+} else {
+  unreviewedContainer.appendChild(wrapper);
+}
     });
 
     setupCopyEvents();
