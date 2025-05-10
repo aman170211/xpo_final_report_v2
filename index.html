@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>Scraped XPO Invoice Entries 4</title>
+  <title>Scraped XPO Invoice Entries 5</title>
   <style>
     /* ========== GLOBAL STYLES ========== */
     body { font-family: Arial, sans-serif; background: #f5f7fa; padding: 30px; }
@@ -105,8 +105,9 @@
 }
 
 /* Tooltip appears when copied */
-.copyable.copied .tooltip {
+.copyable.copied {
   display: inline;
+  background-color: #d4edda !important; /* ✅ soft green tint stays */
 }
 
 
@@ -258,10 +259,8 @@ function setupCopyEvents() {
         // Add 'copied' class to trigger tooltip
         cell.classList.add('copied');
 
-        // Remove tooltip after 1 second
-        setTimeout(() => {
-          cell.classList.remove('copied');
-        }, 1000);
+       
+        
       });
     });
   });
