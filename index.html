@@ -20,18 +20,50 @@
     .tab-buttons button.active { background: #1c3f93; color: white; }
     .tab-section { display: none; }
     .tab-section.active { display: block; }
-    .record {
-      border: 1px solid #ccc;
-      margin-bottom: 15px;
-      border-radius: 8px;
-      background: white;
-      padding: 12px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-    }
     .no-records {
       padding: 20px;
       color: #666;
       font-style: italic;
+    }
+
+    .record-tile {
+      border: 1px solid #ccc;
+      border-left: 6px solid #1c3f93;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+    }
+
+    .record-header {
+      background: #1c3f93;
+      color: white;
+      padding: 12px 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .record-details {
+      display: none;
+      padding: 12px 16px;
+      background: #f9f9f9;
+    }
+
+    .record-details table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .record-details th, .record-details td {
+      text-align: left;
+      padding: 6px 10px;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .record-details th {
+      background: #f0f0f0;
+      font-weight: 600;
+      width: 200px;
     }
   </style>
 </head>
@@ -77,17 +109,37 @@ function renderSection(sectionId, records) {
   }
 
   records.forEach((record, idx) => {
-    const div = document.createElement('div');
-    div.className = 'record';
-    div.innerHTML = `
-      <strong>${idx + 1}. ${record.File_Name || 'No Name'}</strong><br/>
-      <div>🆔 <b>Pro #:</b> ${record.Pro_Number || '—'}</div>
-      <div>📦 <b>BOL:</b> ${record.BOL_BOL || '—'}</div>
-      <div>📅 <b>Date:</b> ${record.Created_Date || '—'}</div>
-      <div>🚚 <b>Shipper:</b> ${record.Shipper_Name || '—'}</div>
-      <div>🏠 <b>Consignee:</b> ${record.Consignee_Name || '—'}</div>
+    const tile = document.createElement('div');
+    tile.className = 'record-tile';
+
+    const header = document.createElement('div');
+    header.className = 'record-header';
+    header.innerHTML = `<strong>${idx + 1}. ${record.File_Name || 'No Name'}</strong> — ${record.Created_Date || 'Unknown Date'}`;
+    header.onclick = () => {
+      detail.style.display = detail.style.display === 'block' ? 'none' : 'block';
+    };
+
+    const detail = document.createElement('div');
+    detail.className = 'record-details';
+    detail.innerHTML = `
+      <table>
+        <tr><th>Pro Number</th><td>${record.Pro_Number || '—'}</td></tr>
+        <tr><th>BOL Number</th><td>${record.BOL_BOL || '—'}</td></tr>
+        <tr><th>Shipper</th><td>${record.Shipper_Name || '—'}</td></tr>
+        <tr><th>Consignee</th><td>${record.Consignee_Name || '—'}</td></tr>
+        <tr><th>Weight</th><td>${record.Total_Weight_BOL || '—'}</td></tr>
+        <tr><th>Freight Charge</th><td>${record.Freight_Charge_Invoice || '—'}</td></tr>
+        <tr><th>Fuel Surcharge</th><td>${record.Fuel_Surcharge_Invoice || '—'}</td></tr>
+        <tr><th>Discount Amount</th><td>${record.Discount_Amount_Invoice || '—'}</td></tr>
+        <tr><th>Subtotal</th><td>${record.SubTotal || '—'}</td></tr>
+        <tr><th>Accessorials</th><td>${record.Accessorials_Invoice || '—'}</td></tr>
+        <tr><th>Order No / PO</th><td>${record.Customer_PO_BOL || '—'}</td></tr>
+      </table>
     `;
-    container.appendChild(div);
+
+    tile.appendChild(header);
+    tile.appendChild(detail);
+    container.appendChild(tile);
   });
 }
 
