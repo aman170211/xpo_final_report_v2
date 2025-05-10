@@ -73,6 +73,44 @@
       font-weight: 600;
       width: 200px;
     }
+/* =========================
+   COPY-TO-CLIPBOARD STYLING
+   ========================= */
+
+/* Makes cell appear clickable */
+.copyable {
+  cursor: pointer;
+  position: relative;
+  background: white;
+  transition: background-color 0.3s;
+}
+
+/* Highlight on hover */
+.copyable:hover {
+  background-color: #e6f0ff;
+}
+
+/* Tooltip shown on copy */
+.copyable .tooltip {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  transform: translateY(-50%);
+  background: #28a745;
+  color: white;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: 11px;
+  display: none;
+}
+
+/* Tooltip appears when copied */
+.copyable.copied .tooltip {
+  display: inline;
+}
+
+
+    
   </style>
 </head>
 <body>
@@ -172,13 +210,23 @@ function renderSection(sectionId, records) {
       if (typeof val === 'object' && val.url) {
         val = `<a href="${val.url}" target="_blank">Open PDF</a>`;
       }
-      tableRows += `<tr><th>${label}</th><td>${val}</td></tr>`;
+      const plainText = typeof record[key] === 'object' ? (record[key]?.url || '') : (record[key] || '');
+tableRows += `
+  <tr>
+    <th>${label}</th>
+    <td class="copyable" data-copy="${plainText}">
+      ${val}
+      <span class="tooltip">Copied!</span>
+    </td>
+  </tr>
+`;
     }
     detail.innerHTML = `<table>${tableRows}</table>`;
 
     tile.appendChild(header);
     tile.appendChild(detail);
     container.appendChild(tile);
+    setupCopyEvents();
   });
 }
 
@@ -193,7 +241,31 @@ function classifyAndRender(data) {
   renderSection('manual-review', data.filter(r => r.Manual_Review_Needed === "true"));
   renderSection('balance-due', data.filter(r => r.Balance_Due_checkbox === "true"));
 }
+// ===============================
+// COPY FIELD VALUE ON CLICK
+// ===============================
 
+function setupCopyEvents() {
+  // Select all table cells marked as copyable
+  document.querySelectorAll('.copyable').forEach(cell => {
+    
+    // Add click handler to each cell
+    cell.addEventListener('click', () => {
+      const text = cell.getAttribute('data-copy'); // Get plain text to copy
+
+      // Copy the value to clipboard
+      navigator.clipboard.writeText(text).then(() => {
+        // Add 'copied' class to trigger tooltip
+        cell.classList.add('copied');
+
+        // Remove tooltip after 1 second
+        setTimeout(() => {
+          cell.classList.remove('copied');
+        }, 1000);
+      });
+    });
+  });
+}
 // ========== TAB SWITCH HANDLER ==========
 function setActiveTab(tabName) {
   const allTabs = ["unreviewed", "reviewed", "manual-review", "balance-due"];
