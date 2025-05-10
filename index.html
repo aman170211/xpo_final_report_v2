@@ -15,7 +15,14 @@
     .tab-buttons button.active { background: #1c3f93; color: white; }
     .tab-section { display: none; }
     .tab-section.active { display: block; }
-    .record { border: 1px solid #ccc; margin-bottom: 15px; border-radius: 8px; background: white; padding: 10px; }
+    .record {
+      border: 1px solid #ccc;
+      margin-bottom: 15px;
+      border-radius: 8px;
+      background: white;
+      padding: 12px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
   </style>
 </head>
 <body>
@@ -45,13 +52,24 @@ function renderSection(containerId, records) {
   records.forEach((record, idx) => {
     const div = document.createElement('div');
     div.className = 'record';
-    div.textContent = `${idx + 1}. ${record.File_Name}`;
+    div.innerHTML = `
+      <strong>${idx + 1}. ${record.File_Name || 'No Name'}</strong><br/>
+      <div>🆔 <b>Pro #:</b> ${record.Pro_Number || '—'}</div>
+      <div>📦 <b>BOL:</b> ${record.BOL_BOL || '—'}</div>
+      <div>📅 <b>Date:</b> ${record.Created_Date || '—'}</div>
+      <div>🚚 <b>Shipper:</b> ${record.Shipper_Name || '—'}</div>
+      <div>🏠 <b>Consignee:</b> ${record.Consignee_Name || '—'}</div>
+    `;
     container.appendChild(div);
   });
 }
 
 function classifyAndRender(data) {
-  renderSection('unreviewedSection', data.filter(r => r.Reviewed === "false" && r.Manual_Review_Needed === "false" && r.Balance_Due_checkbox === "false"));
+  renderSection('unreviewedSection', data.filter(r =>
+    r.Reviewed === "false" &&
+    r.Manual_Review_Needed === "false" &&
+    r.Balance_Due_checkbox === "false"
+  ));
   renderSection('reviewedSection', data.filter(r => r.Reviewed === "true"));
   renderSection('manualReviewSection', data.filter(r => r.Manual_Review_Needed === "true"));
   renderSection('balanceDueSection', data.filter(r => r.Balance_Due_checkbox === "true"));
