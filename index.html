@@ -2,10 +2,11 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>Scraped XPO Invoice Entries 1</title>
+  <title>Scraped XPO Invoice Entries</title>
   <style>
     body { font-family: Arial, sans-serif; background: #f5f7fa; padding: 30px; }
     h2 { margin-bottom: 20px; }
+    .filter-section { margin-bottom: 20px; }
     .tab-buttons { display: flex; gap: 10px; margin-bottom: 20px; }
     .tab-buttons button {
       padding: 10px 20px; border: none; background: #d6dff6; color: #1c3f93;
@@ -20,6 +21,11 @@
 <body>
 <h2>📋 Scraped XPO Invoice Entries</h2>
 
+<div class="filter-section">
+  <label for="createdDate">Created Date:</label>
+  <input type="date" id="createdDate" />
+</div>
+
 <div class="tab-buttons">
   <button id="tab-unreviewed" class="active">📂 Unreviewed</button>
   <button id="tab-reviewed">✅ Reviewed</button>
@@ -33,13 +39,6 @@
 <div id="balanceDueSection" class="tab-section"></div>
 
 <script>
-const dummyData = [
-  { Reviewed: "false", Manual_Review_Needed: "false", Balance_Due_checkbox: "false", File_Name: "Invoice 1" },
-  { Reviewed: "true", Manual_Review_Needed: "false", Balance_Due_checkbox: "false", File_Name: "Invoice 2" },
-  { Reviewed: "false", Manual_Review_Needed: "true", Balance_Due_checkbox: "false", File_Name: "Invoice 3" },
-  { Reviewed: "false", Manual_Review_Needed: "false", Balance_Due_checkbox: "true", File_Name: "Invoice 4" },
-];
-
 function renderSection(containerId, records) {
   const container = document.getElementById(containerId);
   container.innerHTML = '';
@@ -74,7 +73,13 @@ document.getElementById("tab-manual-review").addEventListener("click", () => set
 document.getElementById("tab-balance-due").addEventListener("click", () => setActiveTab("balance-due"));
 
 window.onload = () => {
-  classifyAndRender(dummyData);
+  const input = document.getElementById("createdDate");
+  const today = new Date().toISOString().split("T")[0];
+  input.value = today;
+
+  // Placeholder: Call API using formatted date
+  const data = []; // Replace with actual API response
+  classifyAndRender(data);
 };
 </script>
 </body>
