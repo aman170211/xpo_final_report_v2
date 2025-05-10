@@ -2,11 +2,14 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>Scraped XPO Invoice Entries 2</title>
+  <title>Scraped XPO Invoice Entries 1</title>
   <style>
+    /* ========== GLOBAL STYLES ========== */
     body { font-family: Arial, sans-serif; background: #f5f7fa; padding: 30px; }
     h2 { margin-bottom: 20px; }
     .filter-section { margin-bottom: 20px; }
+
+    /* ========== TAB BUTTON STYLING ========== */
     .tab-buttons { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
     .tab-buttons button {
       padding: 10px 20px;
@@ -18,14 +21,19 @@
       cursor: pointer;
     }
     .tab-buttons button.active { background: #1c3f93; color: white; }
+
+    /* ========== TAB SECTIONS ========== */
     .tab-section { display: none; }
     .tab-section.active { display: block; }
+
+    /* ========== EMPTY MESSAGE STYLING ========== */
     .no-records {
       padding: 20px;
       color: #666;
       font-style: italic;
     }
 
+    /* ========== RECORD TILE STYLING ========== */
     .record-tile {
       border: 1px solid #ccc;
       border-left: 6px solid #1c3f93;
@@ -70,11 +78,13 @@
 <body>
 <h2>📋 Scraped XPO Invoice Entries</h2>
 
+<!-- ========== DATE PICKER ========== -->
 <div class="filter-section">
   <label for="createdDate">Created Date:</label>
   <input type="date" id="createdDate" />
 </div>
 
+<!-- ========== TAB BUTTONS ========== -->
 <div class="tab-buttons">
   <button id="tab-unreviewed" class="active">📂 Unreviewed</button>
   <button id="tab-reviewed">✅ Reviewed</button>
@@ -82,12 +92,43 @@
   <button id="tab-balance-due">💰 Balance Due</button>
 </div>
 
+<!-- ========== TAB SECTIONS ========== -->
 <div id="unreviewed" class="tab-section active"></div>
 <div id="reviewed" class="tab-section"></div>
 <div id="manual-review" class="tab-section"></div>
 <div id="balance-due" class="tab-section"></div>
 
 <script>
+// ========== FIELD MAPPING: Edit this to change which fields to display ==========
+const fieldMapping = {
+  "File_Name": "File Name",
+  "Created_Date": "Created Date",
+  "Pro_Number": "Pro Number",
+  "Delivered_Date_Delivery": "Delivered Date",
+  "BOL_BOL": "BOL/Ship No",
+  "Shipping_Units": "Qty Ship'g Pcs",
+  "Description": "Description",
+  "Shipper_Name": "Shipper",
+  "Shipper_City": "Shipper City",
+  "Shipper_State": "Shipper State",
+  "Shipper_Zip": "Shipper Zip",
+  "Consignee_Name": "Consignee",
+  "Consignee_City": "Consignee City",
+  "Consignee_State": "Consignee State",
+  "Consignee_Zip": "Consignee Zip",
+  "Total_Weight_BOL": "Weight",
+  "Freight_Charge_Invoice": "Freight Charge",
+  "Fuel_Surcharge_Invoice": "Fuel Surcharge",
+  "Discount_Amount_Invoice": "Discount Amount",
+  "SubTotal": "Subtotal",
+  "Accessorials_Invoice": "Accessorials",
+  "Weight": "Weight",
+  "Class_BOL": "Class",
+  "Customer_PO_BOL": "Order No/PO",
+  "Url": "PDF Link"
+};
+
+// ========== MAIN FUNCTION TO RENDER SECTION ==========
 function renderSection(sectionId, records) {
   const container = document.getElementById(sectionId);
   container.innerHTML = '';
@@ -108,6 +149,7 @@ function renderSection(sectionId, records) {
     return;
   }
 
+  // ========== TILE GENERATION LOOP ==========
   records.forEach((record, idx) => {
     const tile = document.createElement('div');
     tile.className = 'record-tile';
@@ -121,21 +163,18 @@ function renderSection(sectionId, records) {
 
     const detail = document.createElement('div');
     detail.className = 'record-details';
-    detail.innerHTML = `
-      <table>
-        <tr><th>Pro Number</th><td>${record.Pro_Number || '—'}</td></tr>
-        <tr><th>BOL Number</th><td>${record.BOL_BOL || '—'}</td></tr>
-        <tr><th>Shipper</th><td>${record.Shipper_Name || '—'}</td></tr>
-        <tr><th>Consignee</th><td>${record.Consignee_Name || '—'}</td></tr>
-        <tr><th>Weight</th><td>${record.Total_Weight_BOL || '—'}</td></tr>
-        <tr><th>Freight Charge</th><td>${record.Freight_Charge_Invoice || '—'}</td></tr>
-        <tr><th>Fuel Surcharge</th><td>${record.Fuel_Surcharge_Invoice || '—'}</td></tr>
-        <tr><th>Discount Amount</th><td>${record.Discount_Amount_Invoice || '—'}</td></tr>
-        <tr><th>Subtotal</th><td>${record.SubTotal || '—'}</td></tr>
-        <tr><th>Accessorials</th><td>${record.Accessorials_Invoice || '—'}</td></tr>
-        <tr><th>Order No / PO</th><td>${record.Customer_PO_BOL || '—'}</td></tr>
-      </table>
-    `;
+
+    // ========== FIELD LOOP ==========
+    let tableRows = '';
+    for (let key in fieldMapping) {
+      const label = fieldMapping[key];
+      let val = record[key] || '—';
+      if (typeof val === 'object' && val.url) {
+        val = `<a href="${val.url}" target="_blank">Open PDF</a>`;
+      }
+      tableRows += `<tr><th>${label}</th><td>${val}</td></tr>`;
+    }
+    detail.innerHTML = `<table>${tableRows}</table>`;
 
     tile.appendChild(header);
     tile.appendChild(detail);
@@ -143,6 +182,7 @@ function renderSection(sectionId, records) {
   });
 }
 
+// ========== CLASSIFICATION LOGIC ==========
 function classifyAndRender(data) {
   renderSection('unreviewed', data.filter(r =>
     r.Reviewed === "false" &&
@@ -154,6 +194,7 @@ function classifyAndRender(data) {
   renderSection('balance-due', data.filter(r => r.Balance_Due_checkbox === "true"));
 }
 
+// ========== TAB SWITCH HANDLER ==========
 function setActiveTab(tabName) {
   const allTabs = ["unreviewed", "reviewed", "manual-review", "balance-due"];
   allTabs.forEach(name => {
@@ -164,6 +205,7 @@ function setActiveTab(tabName) {
   document.getElementById(`tab-${tabName}`).classList.add("active");
 }
 
+// ========== API REQUEST ==========
 async function fetchDataForDate(dateStr) {
   const formattedDate = formatDateToZoho(dateStr);
   const apiUrl = `https://ew0nbf06x1.execute-api.us-east-2.amazonaws.com/XPO_final_Data_fetch?Created_Date=${encodeURIComponent(formattedDate)}`;
@@ -180,12 +222,14 @@ async function fetchDataForDate(dateStr) {
   }
 }
 
+// ========== DATE FORMATTER ==========
 function formatDateToZoho(dateStr) {
   const [yyyy, mm, dd] = dateStr.split("-");
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   return `${dd}-${months[parseInt(mm) - 1]}-${yyyy}`;
 }
 
+// ========== EVENT BINDINGS ==========
 document.getElementById("tab-unreviewed").addEventListener("click", () => setActiveTab("unreviewed"));
 document.getElementById("tab-reviewed").addEventListener("click", () => setActiveTab("reviewed"));
 document.getElementById("tab-manual-review").addEventListener("click", () => setActiveTab("manual-review"));
@@ -195,6 +239,7 @@ document.getElementById("createdDate").addEventListener("change", (e) => {
   fetchDataForDate(e.target.value);
 });
 
+// ========== INITIAL LOAD ========== 
 window.onload = () => {
   const input = document.getElementById("createdDate");
   const today = new Date().toISOString().split("T")[0];
