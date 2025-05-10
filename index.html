@@ -67,19 +67,42 @@ function setActiveTab(tabName) {
   document.getElementById(`tab-${tabName}`).classList.add("active");
 }
 
+async function fetchDataForDate(dateStr) {
+  const formattedDate = formatDateToZoho(dateStr);
+  const apiUrl = `https://ew0nbf06x1.execute-api.us-east-2.amazonaws.com/XPO_final_Data_fetch?Created_Date=${encodeURIComponent(formattedDate)}`;
+  try {
+    const res = await fetch(apiUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+    const data = await res.json();
+    classifyAndRender(data.data || []);
+  } catch (err) {
+    console.warn('❌ Failed to fetch data:', err);
+    classifyAndRender([]);
+  }
+}
+
+function formatDateToZoho(dateStr) {
+  const [yyyy, mm, dd] = dateStr.split("-");
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return `${dd}-${months[parseInt(mm) - 1]}-${yyyy}`;
+}
+
 document.getElementById("tab-unreviewed").addEventListener("click", () => setActiveTab("unreviewed"));
 document.getElementById("tab-reviewed").addEventListener("click", () => setActiveTab("reviewed"));
 document.getElementById("tab-manual-review").addEventListener("click", () => setActiveTab("manual-review"));
 document.getElementById("tab-balance-due").addEventListener("click", () => setActiveTab("balance-due"));
 
+document.getElementById("createdDate").addEventListener("change", (e) => {
+  fetchDataForDate(e.target.value);
+});
+
 window.onload = () => {
   const input = document.getElementById("createdDate");
   const today = new Date().toISOString().split("T")[0];
   input.value = today;
-
-  // Placeholder: Call API using formatted date
-  const data = []; // Replace with actual API response
-  classifyAndRender(data);
+  fetchDataForDate(today);
 };
 </script>
 </body>
