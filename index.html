@@ -64,7 +64,7 @@
 <div class="filter-section">
   <label for="createdDate">Created Date:</label>
   <input type="date" id="createdDate" />
-  <span id="recordCount">📟 Records found: ...</span>
+  <span id="recordCount">📿 Records found: ...</span>
 </div>
 
 <div id="summaryTile" class="summary-tile" style="display:none;">
@@ -150,7 +150,7 @@ window.onload = function () {
     const balanceDueContainer = document.getElementById('balanceDueContainer');
     const count = data.length;
 
-    document.getElementById('recordCount').textContent = `📟 Records found: ${count}`;
+    document.getElementById('recordCount').textContent = `📿 Records found: ${count}`;
     document.getElementById('tileCount').textContent = count;
     document.getElementById('summaryTile').style.display = "block";
 
@@ -204,28 +204,20 @@ window.onload = function () {
           .then(res => res.json())
           .then(data => console.log(`✅ Review status updated for ${recordId}:`, data))
           .catch(err => console.warn(`⚠️ Failed to update review status for ${recordId}`, err));
-
-        if (checkbox.checked) {
-          reviewedContainer.appendChild(wrapper);
-        } else if (isManualReview) {
-          manualReviewContainer.appendChild(wrapper);
-        } else {
-          unreviewedContainer.appendChild(wrapper);
-        }
       });
 
-     const isBalanceDue = String(record.Balance_Due_checkbox).toLowerCase() === "true";
+      const isBalanceDue = record.Balance_Due_checkbox?.toLowerCase() === "true";
 
-if (isBalanceDue) {
-  balanceDueContainer.appendChild(wrapper);
-} else if (isReviewed) {
-  reviewedContainer.appendChild(wrapper);
-} else if (isManualReview) {
-  wrapper.classList.add("manual-review");
-  manualReviewContainer.appendChild(wrapper);
-} else {
-  unreviewedContainer.appendChild(wrapper);
-}
+      if (isBalanceDue) {
+        balanceDueContainer.appendChild(wrapper);
+      } else if (isReviewed) {
+        reviewedContainer.appendChild(wrapper);
+      } else if (isManualReview) {
+        wrapper.classList.add("manual-review");
+        manualReviewContainer.appendChild(wrapper);
+      } else {
+        unreviewedContainer.appendChild(wrapper);
+      }
     });
 
     setupCopyEvents();
@@ -295,7 +287,6 @@ if (isBalanceDue) {
     if (activeTab) activeTab.classList.add("active");
   }
 
-  // Initial setup
   const input = document.getElementById("createdDate");
   const today = new Date().toISOString().split("T")[0];
   input.value = today;
