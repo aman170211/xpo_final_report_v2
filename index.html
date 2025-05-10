@@ -214,7 +214,7 @@ window.onload = function () {
         }
       });
 
-      if (record.Balance_Due_checkbox === true || record.Balance_Due_checkbox === "true") {
+      if (String(record.Balance_Due_checkbox).toLowerCase() === "true") {
         balanceDueContainer.appendChild(wrapper);
       } else if (isReviewed) {
         reviewedContainer.appendChild(wrapper);
