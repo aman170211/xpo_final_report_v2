@@ -153,22 +153,23 @@ function renderSection(sectionId, records) {
 
       if (key === "Accessorials" && Array.isArray(record[key])) {
         const list = record[key];
-        val = 
-          <details>
-            <summary>Show Accessorials (${list.length})</summary>
-            <table style="margin-top:8px; width:100%;">
-              <thead><tr><th>Item</th><th>Charges</th></tr></thead>
-              <tbody>
-                ${list.map(item => 
-                  <tr>
-                    <td class="copyable" data-copy="${item.Item || ''}">${item.Item || '-'}<span class="tooltip">Copied!</span></td>
-                    <td class="copyable" data-copy="${item.Charges || ''}">${item.Charges || '-'}<span class="tooltip">Copied!</span></td>
-                  </tr>
-                ).join('')}
-              </tbody>
-            </table>
-          </details>
-        ;
+       val = `
+  <details>
+    <summary>Show Accessorials (${list.length})</summary>
+    <table style="margin-top:8px; width:100%;">
+      <thead><tr><th>Item</th><th>Charges</th></tr></thead>
+      <tbody>
+        ${list.map(item => `
+          <tr>
+            <td class="copyable" data-copy="${item.Item || ''}">${item.Item || '-'}<span class="tooltip">Copied!</span></td>
+            <td class="copyable" data-copy="${item.Charges || ''}">${item.Charges || '-'}<span class="tooltip">Copied!</span></td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+  </details>
+`;
+
       } else if (typeof val === 'object' && val.url) {
         val = <a href="${val.url}" target="_blank">Open PDF</a>;
       }
