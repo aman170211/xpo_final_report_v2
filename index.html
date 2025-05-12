@@ -3,7 +3,7 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>Scraped XPO Invoice Entries 14</title>
+  <title>Scraped XPO Invoice Entries 15</title>
   <style>
     body { font-family: Arial, sans-serif; background: #f5f7fa; padding: 30px; }
     h2 { margin-bottom: 20px; }
@@ -187,24 +187,28 @@ function renderSection(sectionId, records) {
     });
 
     if (sectionId === 'unreviewed') {
-      const checkbox = header.querySelector('.reviewCheckbox');
-      checkbox.addEventListener('change', () => {
-        const reviewedVal = checkbox.checked ? "true" : "false";
-        const url = `https://svnng1c8c3.execute-api.us-east-2.amazonaws.com/default/Mark_Reviewd_XPO?record_id=${recordId}&reviewed=${reviewedVal}`;
+ const checkbox = header.querySelector('.reviewCheckbox');
+checkbox.addEventListener('change', () => {
+  const reviewedVal = checkbox.checked ? "true" : "false";
+  const url = `https://svnng1c8c3.execute-api.us-east-2.amazonaws.com/default/Mark_Reviewd_XPO?record_id=${recordId}&reviewed=${reviewedVal}`;
 
-        fetch(url, { method: 'POST' })
-          .then(res => res.json())
-          .then(data => {
-            console.log(`✅ Review status updated for ${recordId}:`, data);
-            document.getElementById("reviewed").appendChild(tile);
-          })
-          .catch(err => {
-            console.warn(`⚠️ Failed to update review status for ${recordId}`, err);
-            checkbox.checked = false;
-          });
-      });
-    }
-  });
+  fetch(url, { method: 'POST' })
+    .then(res => res.json())
+    .then(data => {
+      console.log(`✅ Review status updated for ${recordId}:`, data);
+
+      // Remove checkbox from UI (because reviewed section doesn't show it)
+      checkbox.remove();
+
+      // Move tile to reviewed section
+      document.getElementById("reviewed").appendChild(tile);
+    })
+    .catch(err => {
+      console.warn(`⚠️ Failed to update review status for ${recordId}`, err);
+      checkbox.checked = false;
+    });
+});
+
 }
 
 function classifyAndRender(data) {
