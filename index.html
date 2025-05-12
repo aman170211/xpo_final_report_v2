@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>Scraped XPO Invoice Entries 7</title>
+  <title>Scraped XPO Invoice Entries 8</title>
   <style>
     /* ========== GLOBAL STYLES ========== */
     body { font-family: Arial, sans-serif; background: #f5f7fa; padding: 30px; }
@@ -211,7 +211,7 @@ function renderSection(sectionId, records) {
       let val = record[key] || '—';
 
 // Handle Accessorials list as expandable
-if (key === "Accessorials_Invoice" && Array.isArray(record[key])) {
+if (key === "Accessorials" && Array.isArray(record[key])) {
   const accessorialList = record[key];
   const accessorialHTML = accessorialList.map(a =>
     `<tr><td>${a.item || ''}</td><td>${a.charges || ''}</td></tr>`
