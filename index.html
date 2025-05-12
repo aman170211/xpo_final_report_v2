@@ -212,23 +212,30 @@ function renderSection(sectionId, records) {
 
 // Handle Accessorials list as expandable
 if (key === "Accessorials" && Array.isArray(record[key])) {
-  const accessorialList = record[key];
-  const accessorialHTML = accessorialList.map(a =>
-    `<tr><td>${a.item || ''}</td><td>${a.charges || ''}</td></tr>`
-  ).join('');
-
+  const list = record[key];
   val = `
     <details>
-      <summary>Show Accessorials (${accessorialList.length})</summary>
+      <summary>Show Accessorials (${list.length})</summary>
       <table style="margin-top:8px; border-collapse: collapse; width:100%;">
         <thead>
-          <tr style="background:#f0f0f0;"><th style="text-align:left;">Item</th><th style="text-align:left;">Charges</th></tr>
+          <tr style="background:#f0f0f0;">
+            <th style="text-align:left;">Item</th>
+            <th style="text-align:left;">Charges</th>
+          </tr>
         </thead>
-        <tbody>${accessorialHTML}</tbody>
+        <tbody>
+          ${list.map(item => `
+            <tr>
+              <td>${item.Item || '-'}</td>
+              <td>${item.Charges || '-'}</td>
+            </tr>
+          `).join('')}
+        </tbody>
       </table>
     </details>
   `;
 }
+
       if (typeof val === 'object' && val.url) {
         val = `<a href="${val.url}" target="_blank">Open PDF</a>`;
       }
