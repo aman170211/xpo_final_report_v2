@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>Scraped XPO Invoice Entries 9</title>
+  <title>Scraped XPO Invoice Entries 10</title>
   <style>
     /* ========== GLOBAL STYLES ========== */
     body { font-family: Arial, sans-serif; background: #f5f7fa; padding: 30px; }
@@ -226,8 +226,14 @@ if (key === "Accessorials" && Array.isArray(record[key])) {
         <tbody>
           ${list.map(item => `
             <tr>
-              <td>${item.Item || '-'}</td>
-              <td>${item.Charges || '-'}</td>
+              <td class="copyable" data-copy="${item.Item || ''}">
+                ${item.Item || '-'}
+                <span class="tooltip">Copied!</span>
+              </td>
+              <td class="copyable" data-copy="${item.Charges || ''}">
+                ${item.Charges || '-'}
+                <span class="tooltip">Copied!</span>
+              </td>
             </tr>
           `).join('')}
         </tbody>
