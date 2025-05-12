@@ -194,15 +194,16 @@ function renderSection(sectionId, records) {
         const reviewedVal = checkbox.checked ? "true" : "false";
         const url = `https://svnng1c8c3.execute-api.us-east-2.amazonaws.com/default/Mark_Reviewd_XPO?record_id=${recordId}&reviewed=${reviewedVal}`;
 
+        // Move tile to reviewed section immediately
+        checkbox.remove(); // remove checkbox visually
+        reviewedSection.appendChild(tile); // move to reviewed
+
         fetch(url, { method: 'POST' })
           .then(res => res.json())
-          .then(data => {
-            checkbox.remove(); // remove checkbox visually
-            reviewedSection.appendChild(tile); // move to reviewed
-          })
           .catch(err => {
             console.warn(`❌ Failed to update review status for ${recordId}`, err);
-            checkbox.checked = false;
+            // Optionally, you could move the tile back if needed
+            // But as per your request, the move is instant regardless of API result
           });
       });
     }
