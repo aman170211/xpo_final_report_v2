@@ -3,7 +3,7 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>Scraped XPO Invoice Entries 15</title>
+  <title>Scraped XPO Invoice Entries 16</title>
   <style>
     body { font-family: Arial, sans-serif; background: #f5f7fa; padding: 30px; }
     h2 { margin-bottom: 20px; }
@@ -137,10 +137,11 @@ function renderSection(sectionId, records) {
 
     const header = document.createElement('div');
     header.className = 'record-header';
-    header.innerHTML = `
-      <strong>${idx + 1}. ${record.File_Name || 'No Name'}</strong> — ${record.Created_Date || 'Unknown Date'}
-      ${sectionId === 'unreviewed' ? '<input type="checkbox" class="reviewCheckbox" title="Mark as Reviewed" style="float:right; transform:scale(1.3);" />' : ''}
-    `;
+   header.innerHTML = `
+  <strong>${idx + 1}. ${record.File_Name || 'No Name'}</strong> — ${record.Created_Date || 'Unknown Date'}
+  ${sectionId === 'unreviewed' ? '<input type="checkbox" class="reviewCheckbox" title="Mark as Reviewed" style="float:right; transform:scale(1.3);" />' : ''}
+`;
+
 
     const detail = document.createElement('div');
     detail.className = 'record-details';
@@ -152,31 +153,31 @@ function renderSection(sectionId, records) {
 
       if (key === "Accessorials" && Array.isArray(record[key])) {
         const list = record[key];
-        val = `
+        val = 
           <details>
             <summary>Show Accessorials (${list.length})</summary>
             <table style="margin-top:8px; width:100%;">
               <thead><tr><th>Item</th><th>Charges</th></tr></thead>
               <tbody>
-                ${list.map(item => `
+                ${list.map(item => 
                   <tr>
                     <td class="copyable" data-copy="${item.Item || ''}">${item.Item || '-'}<span class="tooltip">Copied!</span></td>
                     <td class="copyable" data-copy="${item.Charges || ''}">${item.Charges || '-'}<span class="tooltip">Copied!</span></td>
                   </tr>
-                `).join('')}
+                ).join('')}
               </tbody>
             </table>
           </details>
-        `;
+        ;
       } else if (typeof val === 'object' && val.url) {
-        val = `<a href="${val.url}" target="_blank">Open PDF</a>`;
+        val = <a href="${val.url}" target="_blank">Open PDF</a>;
       }
 
       const rawText = typeof record[key] === 'object' ? (record[key]?.url || '') : (record[key] || '');
-      tableRows += `<tr><th>${label}</th><td class="copyable" data-copy="${rawText}">${val}<span class="tooltip">Copied!</span></td></tr>`;
+      tableRows += <tr><th>${label}</th><td class="copyable" data-copy="${rawText}">${val}<span class="tooltip">Copied!</span></td></tr>;
     }
 
-    detail.innerHTML = `<table>${tableRows}</table>`;
+    detail.innerHTML = <table>${tableRows}</table>;
     tile.appendChild(header);
     tile.appendChild(detail);
     container.appendChild(tile);
@@ -187,28 +188,24 @@ function renderSection(sectionId, records) {
     });
 
     if (sectionId === 'unreviewed') {
- const checkbox = header.querySelector('.reviewCheckbox');
-checkbox.addEventListener('change', () => {
-  const reviewedVal = checkbox.checked ? "true" : "false";
-  const url = `https://svnng1c8c3.execute-api.us-east-2.amazonaws.com/default/Mark_Reviewd_XPO?record_id=${recordId}&reviewed=${reviewedVal}`;
+      const checkbox = header.querySelector('.reviewCheckbox');
+      checkbox.addEventListener('change', () => {
+        const reviewedVal = checkbox.checked ? "true" : "false";
+        const url = https://svnng1c8c3.execute-api.us-east-2.amazonaws.com/default/Mark_Reviewd_XPO?record_id=${recordId}&reviewed=${reviewedVal};
 
-  fetch(url, { method: 'POST' })
-    .then(res => res.json())
-    .then(data => {
-      console.log(`✅ Review status updated for ${recordId}:`, data);
-
-      // Remove checkbox from UI (because reviewed section doesn't show it)
-      checkbox.remove();
-
-      // Move tile to reviewed section
-      document.getElementById("reviewed").appendChild(tile);
-    })
-    .catch(err => {
-      console.warn(`⚠️ Failed to update review status for ${recordId}`, err);
-      checkbox.checked = false;
-    });
-});
-
+        fetch(url, { method: 'POST' })
+          .then(res => res.json())
+          .then(data => {
+            console.log(✅ Review status updated for ${recordId}:, data);
+            document.getElementById("reviewed").appendChild(tile);
+          })
+          .catch(err => {
+            console.warn(⚠️ Failed to update review status for ${recordId}, err);
+            checkbox.checked = false;
+          });
+      });
+    }
+  });
 }
 
 function classifyAndRender(data) {
@@ -237,15 +234,15 @@ function setupCopyEvents() {
 function setActiveTab(tabName) {
   ["unreviewed", "reviewed", "manual-review", "balance-due"].forEach(name => {
     document.getElementById(name).classList.remove("active");
-    document.getElementById(`tab-${name}`).classList.remove("active");
+    document.getElementById(tab-${name}).classList.remove("active");
   });
   document.getElementById(tabName).classList.add("active");
-  document.getElementById(`tab-${tabName}`).classList.add("active");
+  document.getElementById(tab-${tabName}).classList.add("active");
 }
 
 async function fetchDataForDate(dateStr) {
   const formattedDate = formatDateToZoho(dateStr);
-  const apiUrl = `https://ew0nbf06x1.execute-api.us-east-2.amazonaws.com/XPO_final_Data_fetch?Created_Date=${encodeURIComponent(formattedDate)}`;
+  const apiUrl = https://ew0nbf06x1.execute-api.us-east-2.amazonaws.com/XPO_final_Data_fetch?Created_Date=${encodeURIComponent(formattedDate)};
   try {
     const res = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
     const data = await res.json();
@@ -259,7 +256,7 @@ async function fetchDataForDate(dateStr) {
 function formatDateToZoho(dateStr) {
   const [yyyy, mm, dd] = dateStr.split("-");
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  return `${dd}-${months[parseInt(mm) - 1]}-${yyyy}`;
+  return ${dd}-${months[parseInt(mm) - 1]}-${yyyy};
 }
 
 document.getElementById("tab-unreviewed").addEventListener("click", () => setActiveTab("unreviewed"));
