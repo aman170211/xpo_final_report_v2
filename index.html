@@ -1,15 +1,13 @@
+<!-- ✅ YOUR FULL UPDATED FILE BELOW – Scraped XPO Invoice Entries 13 -->
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>Scraped XPO Invoice Entries 12</title>
+  <title>Scraped XPO Invoice Entries 14</title>
   <style>
-    /* ========== GLOBAL STYLES ========== */
     body { font-family: Arial, sans-serif; background: #f5f7fa; padding: 30px; }
     h2 { margin-bottom: 20px; }
     .filter-section { margin-bottom: 20px; }
-
-    /* ========== TAB BUTTON STYLING ========== */
     .tab-buttons { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
     .tab-buttons button {
       padding: 10px 20px;
@@ -21,19 +19,13 @@
       cursor: pointer;
     }
     .tab-buttons button.active { background: #1c3f93; color: white; }
-
-    /* ========== TAB SECTIONS ========== */
     .tab-section { display: none; }
     .tab-section.active { display: block; }
-
-    /* ========== EMPTY MESSAGE STYLING ========== */
     .no-records {
       padding: 20px;
       color: #666;
       font-style: italic;
     }
-
-    /* ========== RECORD TILE STYLING ========== */
     .record-tile {
       border: 1px solid #ccc;
       border-left: 6px solid #1c3f93;
@@ -42,7 +34,6 @@
       background: #fff;
       box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
     }
-
     .record-header {
       background: #1c3f93;
       color: white;
@@ -50,293 +41,197 @@
       font-weight: bold;
       cursor: pointer;
     }
-
     .record-details {
       display: none;
       padding: 12px 16px;
       background: #f9f9f9;
     }
-
     .record-details table {
       width: 100%;
       border-collapse: collapse;
     }
-
     .record-details th, .record-details td {
       text-align: left;
       padding: 6px 10px;
       border-bottom: 1px solid #ddd;
     }
-
     .record-details th {
       background: #f0f0f0;
       font-weight: 600;
       width: 200px;
     }
-/* =========================
-   COPY-TO-CLIPBOARD STYLING
-   ========================= */
-
-/* Makes cell appear clickable */
-.copyable {
-  cursor: pointer;
-  position: relative;
-  background: white;
-  transition: background-color 0.3s;
-}
-
-/* Highlight on hover */
-.copyable:hover {
-  background-color: #e6f0ff;
-}
-
-/* Tooltip shown on copy */
-.copyable .tooltip {
-  position: absolute;
-  top: 50%;
-  right: 10px;
-  transform: translateY(-50%);
-  background: #28a745;
-  color: white;
-  padding: 3px 6px;
-  border-radius: 4px;
-  font-size: 11px;
-  display: none;
-}
-
-/* Tooltip appears when copied */
-.copyable.copied {
-  display: inline;
-  background-color: #d4edda !important; /* ✅ soft green tint stays */
-}
-
-
-    
+    .copyable {
+      cursor: pointer;
+      position: relative;
+      background: white;
+      transition: background-color 0.3s;
+    }
+    .copyable:hover {
+      background-color: #e6f0ff;
+    }
+    .copyable .tooltip {
+      position: absolute;
+      top: 50%;
+      right: 10px;
+      transform: translateY(-50%);
+      background: #28a745;
+      color: white;
+      padding: 3px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      display: none;
+    }
+    .copyable.copied {
+      background-color: #d4edda !important;
+    }
+    .copyable.copied .tooltip {
+      display: inline;
+    }
   </style>
 </head>
 <body>
 <h2>📋 Scraped XPO Invoice Entries</h2>
-
-<!-- ========== DATE PICKER ========== -->
 <div class="filter-section">
   <label for="createdDate">Created Date:</label>
   <input type="date" id="createdDate" />
 </div>
-
-<!-- ========== TAB BUTTONS ========== -->
 <div class="tab-buttons">
   <button id="tab-unreviewed" class="active">📂 Unreviewed</button>
   <button id="tab-reviewed">✅ Reviewed</button>
   <button id="tab-manual-review">⚠️ Manual Review</button>
   <button id="tab-balance-due">💰 Balance Due</button>
 </div>
-
-<!-- ========== TAB SECTIONS ========== -->
 <div id="unreviewed" class="tab-section active"></div>
 <div id="reviewed" class="tab-section"></div>
 <div id="manual-review" class="tab-section"></div>
 <div id="balance-due" class="tab-section"></div>
 
 <script>
-// ========== FIELD MAPPING: Edit this to change which fields to display ==========
 const fieldMapping = {
-  "File_Name": "File Name",
-  "Created_Date": "Created Date",
-  "Pro_Number": "Pro Number",
-  "Delivered_Date_Delivery": "Delivered Date",
-  "BOL_BOL": "BOL/Ship No",
-  "Shipping_Units": "Qty Ship'g Pcs",
-  "Description": "Description",
-  "Shipper_Name": "Shipper",
-  "Shipper_City": "Shipper City",
-  "Shipper_State": "Shipper State",
-  "Shipper_Zip": "Shipper Zip",
-  "Consignee_Name": "Consignee",
-  "Consignee_City": "Consignee City",
-  "Consignee_State": "Consignee State",
-  "Consignee_Zip": "Consignee Zip",
-  "Total_Weight_BOL": "Weight",
-  "Freight_Charge_Invoice": "Freight Charge",
-  "Fuel_Surcharge_Invoice": "Fuel Surcharge",
-  "Discount_Amount_Invoice": "Discount Amount",
-  "SubTotal": "Subtotal",
-  "Accessorials_Invoice": "Accessorials",
-  "Accessorials": "Accessorials Lineitem",
-  "Weight": "Weight",
-  "Class_BOL": "Class",
-  "Customer_PO_BOL": "Order No/PO",
-  "Url": "PDF Link"
+  "File_Name": "File Name", "Created_Date": "Created Date", "Pro_Number": "Pro Number",
+  "Delivered_Date_Delivery": "Delivered Date", "BOL_BOL": "BOL/Ship No",
+  "Shipping_Units": "Qty Ship'g Pcs", "Description": "Description",
+  "Shipper_Name": "Shipper", "Shipper_City": "Shipper City", "Shipper_State": "Shipper State",
+  "Shipper_Zip": "Shipper Zip", "Consignee_Name": "Consignee", "Consignee_City": "Consignee City",
+  "Consignee_State": "Consignee State", "Consignee_Zip": "Consignee Zip",
+  "Total_Weight_BOL": "Weight", "Freight_Charge_Invoice": "Freight Charge",
+  "Fuel_Surcharge_Invoice": "Fuel Surcharge", "Discount_Amount_Invoice": "Discount Amount",
+  "SubTotal": "Subtotal", "Accessorials_Invoice": "Accessorials", "Accessorials": "Accessorials Lineitem",
+  "Weight": "Weight", "Class_BOL": "Class", "Customer_PO_BOL": "Order No/PO", "Url": "PDF Link"
 };
 
-// ========== MAIN FUNCTION TO RENDER SECTION ==========
 function renderSection(sectionId, records) {
   const container = document.getElementById(sectionId);
   container.innerHTML = '';
 
-  const sectionNames = {
-    "unreviewed": "Unreviewed",
-    "reviewed": "Reviewed",
-    "manual-review": "Manual Review",
-    "balance-due": "Balance Due"
-  };
-
   if (records.length === 0) {
     const inputDate = document.getElementById("createdDate").value;
-    const msg = document.createElement("div");
-    msg.className = "no-records";
-    msg.textContent = `No records in ${sectionNames[sectionId]} on ${inputDate}`;
-    container.appendChild(msg);
+    container.innerHTML = `<div class="no-records">No records in ${sectionId} on ${inputDate}</div>`;
     return;
   }
 
-  // ========== TILE GENERATION LOOP ==========
   records.forEach((record, idx) => {
     const tile = document.createElement('div');
     tile.className = 'record-tile';
+    const recordId = record.ID || record.Id || record.id;
 
     const header = document.createElement('div');
     header.className = 'record-header';
-    const recordId = record.ID || record.Id || record.id;
-
-if (sectionId === "unreviewed") {
-  header.innerHTML = `
-    <strong>${idx + 1}. ${record.File_Name || 'No Name'}</strong> — ${record.Created_Date || 'Unknown Date'}
-    <input type="checkbox" class="reviewCheckbox" title="Mark as Reviewed" style="float:right; transform:scale(1.3);" />
-  `;
-
-  // Delay binding to allow checkbox to render
-  setTimeout(() => {
-    const checkbox = header.querySelector('.reviewCheckbox');
-    checkbox.addEventListener('change', () => {
-      const reviewedVal = checkbox.checked ? "true" : "false";
-      const url = `https://svnng1c8c3.execute-api.us-east-2.amazonaws.com/default/Mark_Reviewd_XPO?record_id=${recordId}&reviewed=${reviewedVal}`;
-
-      fetch(url, { method: 'POST' })
-        .then(res => res.json())
-        .then(data => {
-          console.log(`✅ Review status updated for ${recordId}:`, data);
-          document.getElementById("reviewed").appendChild(tile); // Move tile
-        })
-        .catch(err => {
-          console.warn(`⚠️ Failed to update review status for ${recordId}`, err);
-          checkbox.checked = false; // rollback if failed
-        });
-    });
-  }, 0);
-} else {
-  header.innerHTML = `<strong>${idx + 1}. ${record.File_Name || 'No Name'}</strong> — ${record.Created_Date || 'Unknown Date'}`;
-}
-    header.onclick = () => {
-      detail.style.display = detail.style.display === 'block' ? 'none' : 'block';
-    };
+    header.innerHTML = `
+      <strong>${idx + 1}. ${record.File_Name || 'No Name'}</strong> — ${record.Created_Date || 'Unknown Date'}
+      ${sectionId === 'unreviewed' ? '<input type="checkbox" class="reviewCheckbox" title="Mark as Reviewed" style="float:right; transform:scale(1.3);" />' : ''}
+    `;
 
     const detail = document.createElement('div');
     detail.className = 'record-details';
 
-    // ========== FIELD LOOP ==========
     let tableRows = '';
     for (let key in fieldMapping) {
       const label = fieldMapping[key];
       let val = record[key] || '—';
 
-// Handle Accessorials list as expandable
-if (key === "Accessorials" && Array.isArray(record[key])) {
-  const list = record[key];
-  val = `
-    <details>
-      <summary>Show Accessorials (${list.length})</summary>
-      <table style="margin-top:8px; border-collapse: collapse; width:100%;">
-        <thead>
-          <tr style="background:#f0f0f0;">
-            <th style="text-align:left;">Item</th>
-            <th style="text-align:left;">Charges</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${list.map(item => `
-            <tr>
-              <td class="copyable" data-copy="${item.Item || ''}">
-                ${item.Item || '-'}
-                <span class="tooltip">Copied!</span>
-              </td>
-              <td class="copyable" data-copy="${item.Charges || ''}">
-                ${item.Charges || '-'}
-                <span class="tooltip">Copied!</span>
-              </td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    </details>
-  `;
-}
-
-      if (typeof val === 'object' && val.url) {
+      if (key === "Accessorials" && Array.isArray(record[key])) {
+        const list = record[key];
+        val = `
+          <details>
+            <summary>Show Accessorials (${list.length})</summary>
+            <table style="margin-top:8px; width:100%;">
+              <thead><tr><th>Item</th><th>Charges</th></tr></thead>
+              <tbody>
+                ${list.map(item => `
+                  <tr>
+                    <td class="copyable" data-copy="${item.Item || ''}">${item.Item || '-'}<span class="tooltip">Copied!</span></td>
+                    <td class="copyable" data-copy="${item.Charges || ''}">${item.Charges || '-'}<span class="tooltip">Copied!</span></td>
+                  </tr>
+                `).join('')}
+              </tbody>
+            </table>
+          </details>
+        `;
+      } else if (typeof val === 'object' && val.url) {
         val = `<a href="${val.url}" target="_blank">Open PDF</a>`;
       }
-      const plainText = typeof record[key] === 'object' ? (record[key]?.url || '') : (record[key] || '');
-tableRows += `
-  <tr>
-    <th>${label}</th>
-    <td class="copyable" data-copy="${plainText}">
-      ${val}
-      <span class="tooltip">Copied!</span>
-    </td>
-  </tr>
-`;
-    }
-    detail.innerHTML = `<table>${tableRows}</table>`;
 
+      const rawText = typeof record[key] === 'object' ? (record[key]?.url || '') : (record[key] || '');
+      tableRows += `<tr><th>${label}</th><td class="copyable" data-copy="${rawText}">${val}<span class="tooltip">Copied!</span></td></tr>`;
+    }
+
+    detail.innerHTML = `<table>${tableRows}</table>`;
     tile.appendChild(header);
     tile.appendChild(detail);
     container.appendChild(tile);
-    setupCopyEvents();
+
+    header.addEventListener("click", (e) => {
+      if (e.target.classList.contains('reviewCheckbox')) return;
+      detail.style.display = detail.style.display === 'block' ? 'none' : 'block';
+    });
+
+    if (sectionId === 'unreviewed') {
+      const checkbox = header.querySelector('.reviewCheckbox');
+      checkbox.addEventListener('change', () => {
+        const reviewedVal = checkbox.checked ? "true" : "false";
+        const url = `https://svnng1c8c3.execute-api.us-east-2.amazonaws.com/default/Mark_Reviewd_XPO?record_id=${recordId}&reviewed=${reviewedVal}`;
+
+        fetch(url, { method: 'POST' })
+          .then(res => res.json())
+          .then(data => {
+            console.log(`✅ Review status updated for ${recordId}:`, data);
+            document.getElementById("reviewed").appendChild(tile);
+          })
+          .catch(err => {
+            console.warn(`⚠️ Failed to update review status for ${recordId}`, err);
+            checkbox.checked = false;
+          });
+      });
+    }
   });
 }
 
-// ========== CLASSIFICATION LOGIC ==========
 function classifyAndRender(data) {
   renderSection('unreviewed', data.filter(r =>
-    r.Reviewed === "false" &&
-    r.Manual_Review_Needed === "false" &&
-    r.Balance_Due_checkbox === "false"
-  ));
+    r.Reviewed === "false" && r.Manual_Review_Needed === "false" && r.Balance_Due_checkbox === "false"));
   renderSection('reviewed', data.filter(r => r.Reviewed === "true"));
   renderSection('manual-review', data.filter(r => r.Manual_Review_Needed === "true"));
   renderSection('balance-due', data.filter(r => r.Balance_Due_checkbox === "true"));
 }
-// ===============================
-// COPY FIELD VALUE ON CLICK
-// ===============================
 
-// COPY FIELD VALUE ON CLICK — using event delegation
-// ===============================
 function setupCopyEvents() {
   document.body.addEventListener('click', (e) => {
     const cell = e.target.closest('.copyable');
     if (!cell) return;
-
     const text = cell.getAttribute('data-copy');
     if (!text) return;
 
     navigator.clipboard.writeText(text).then(() => {
-      // Clear previous copies
-      document.querySelectorAll('.copyable.copied').forEach(el => el.classList.remove('copied'));
-
-      // Mark this cell as copied
       cell.classList.add('copied');
-
-      // Optionally remove copied tint after 1 second
-      setTimeout(() => {
-        cell.classList.remove('copied');
-      }, 1000);
+      const tooltip = cell.querySelector('.tooltip');
+      tooltip.style.display = 'inline';
     });
   });
 }
-// ========== TAB SWITCH HANDLER ==========
+
 function setActiveTab(tabName) {
-  const allTabs = ["unreviewed", "reviewed", "manual-review", "balance-due"];
-  allTabs.forEach(name => {
+  ["unreviewed", "reviewed", "manual-review", "balance-due"].forEach(name => {
     document.getElementById(name).classList.remove("active");
     document.getElementById(`tab-${name}`).classList.remove("active");
   });
@@ -344,15 +239,11 @@ function setActiveTab(tabName) {
   document.getElementById(`tab-${tabName}`).classList.add("active");
 }
 
-// ========== API REQUEST ==========
 async function fetchDataForDate(dateStr) {
   const formattedDate = formatDateToZoho(dateStr);
   const apiUrl = `https://ew0nbf06x1.execute-api.us-east-2.amazonaws.com/XPO_final_Data_fetch?Created_Date=${encodeURIComponent(formattedDate)}`;
   try {
-    const res = await fetch(apiUrl, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' }
-    });
+    const res = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
     const data = await res.json();
     classifyAndRender(data.data || []);
   } catch (err) {
@@ -361,34 +252,25 @@ async function fetchDataForDate(dateStr) {
   }
 }
 
-// ========== DATE FORMATTER ==========
 function formatDateToZoho(dateStr) {
   const [yyyy, mm, dd] = dateStr.split("-");
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   return `${dd}-${months[parseInt(mm) - 1]}-${yyyy}`;
 }
 
-// ========== EVENT BINDINGS ==========
 document.getElementById("tab-unreviewed").addEventListener("click", () => setActiveTab("unreviewed"));
 document.getElementById("tab-reviewed").addEventListener("click", () => setActiveTab("reviewed"));
 document.getElementById("tab-manual-review").addEventListener("click", () => setActiveTab("manual-review"));
 document.getElementById("tab-balance-due").addEventListener("click", () => setActiveTab("balance-due"));
+document.getElementById("createdDate").addEventListener("change", (e) => fetchDataForDate(e.target.value));
 
-document.getElementById("createdDate").addEventListener("change", (e) => {
-  fetchDataForDate(e.target.value);
-});
-
-// ========== INITIAL LOAD ========== 
 window.onload = () => {
   const input = document.getElementById("createdDate");
   const today = new Date().toISOString().split("T")[0];
   input.value = today;
   fetchDataForDate(today);
+  setupCopyEvents(); // ✅ call once
 };
-
-// ✅ Step 3: Call copy handler after setup
-setupCopyEvents();
-
 </script>
 </body>
 </html>
