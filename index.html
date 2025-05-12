@@ -175,7 +175,8 @@ function renderSection(sectionId, records) {
       }
 
       const rawText = typeof record[key] === 'object' ? (record[key]?.url || '') : (record[key] || '');
-      tableRows += <tr><th>${label}</th><td class="copyable" data-copy="${rawText}">${val}<span class="tooltip">Copied!</span></td></tr>;
+      tableRows += `<tr><th>${label}</th><td class="copyable" data-copy="${rawText}">${val}<span class="tooltip">Copied!</span></td></tr>`;
+
     }
 
     detail.innerHTML = <table>${tableRows}</table>;
@@ -235,7 +236,7 @@ function setupCopyEvents() {
 function setActiveTab(tabName) {
   ["unreviewed", "reviewed", "manual-review", "balance-due"].forEach(name => {
     document.getElementById(name).classList.remove("active");
-    document.getElementById(tab-${name}).classList.remove("active");
+    document.getElementById(`tab-${name}`).classList.remove("active");
   });
   document.getElementById(tabName).classList.add("active");
   document.getElementById(tab-${tabName}).classList.add("active");
