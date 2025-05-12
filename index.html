@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8" />
-  <title>Scraped XPO Invoice Entries 10</title>
+  <title>Scraped XPO Invoice Entries 11</title>
   <style>
     /* ========== GLOBAL STYLES ========== */
     body { font-family: Arial, sans-serif; background: #f5f7fa; padding: 30px; }
@@ -280,22 +280,27 @@ function classifyAndRender(data) {
 // COPY FIELD VALUE ON CLICK
 // ===============================
 
+// COPY FIELD VALUE ON CLICK — using event delegation
+// ===============================
 function setupCopyEvents() {
-  // Select all table cells marked as copyable
-  document.querySelectorAll('.copyable').forEach(cell => {
-    
-    // Add click handler to each cell
-    cell.addEventListener('click', () => {
-      const text = cell.getAttribute('data-copy'); // Get plain text to copy
+  document.body.addEventListener('click', (e) => {
+    const cell = e.target.closest('.copyable');
+    if (!cell) return;
 
-      // Copy the value to clipboard
-      navigator.clipboard.writeText(text).then(() => {
-        // Add 'copied' class to trigger tooltip
-        cell.classList.add('copied');
+    const text = cell.getAttribute('data-copy');
+    if (!text) return;
 
-       
-        
-      });
+    navigator.clipboard.writeText(text).then(() => {
+      // Clear previous copies
+      document.querySelectorAll('.copyable.copied').forEach(el => el.classList.remove('copied'));
+
+      // Mark this cell as copied
+      cell.classList.add('copied');
+
+      // Optionally remove copied tint after 1 second
+      setTimeout(() => {
+        cell.classList.remove('copied');
+      }, 1000);
     });
   });
 }
@@ -351,6 +356,10 @@ window.onload = () => {
   input.value = today;
   fetchDataForDate(today);
 };
+
+// ✅ Step 3: Call copy handler after setup
+setupCopyEvents();
+
 </script>
 </body>
 </html>
